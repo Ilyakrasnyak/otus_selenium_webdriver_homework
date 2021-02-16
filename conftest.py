@@ -1,11 +1,13 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.opera.options import Options as OperaOptions
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 def pytest_addoption(parser):
-    parser.addoption("--browser", action="store", choices=["chrome", "firefox", "opera"], help="Browser")
-    parser.addoption("--host", action="store", default="localhost", help="Base URL")
+    parser.addoption("--browser", action="store", choices=["chrome", "firefox", "opera"],
+                     default='chrome', help="Browser")
+    parser.addoption("--host", action="store", default="127.0.0.1", help="Base URL")
 
 
 @pytest.fixture(scope="session")
@@ -48,3 +50,12 @@ def endpoint(request):
         "admin": host + "/admin/"
     }
     return endpoint
+
+
+@pytest.fixture(scope="session")
+def admin():
+    admin = {
+        "name": "user",
+        "password": "bitnami"
+    }
+    return admin
