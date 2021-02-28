@@ -1,7 +1,6 @@
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException
-from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class BasePage:
@@ -23,7 +22,6 @@ class BasePage:
         wait = WebDriverWait(self.driver, wait)
         return wait.until(EC.visibility_of_element_located(element))
 
-
     def is_all_element_visible(self, wait=5):
         for element in self.elements.values():
             try:
@@ -34,3 +32,7 @@ class BasePage:
     def is_element_clickable(self, element, wait=5):
         wait = WebDriverWait(self.driver, wait)
         return wait.until(EC.element_to_be_clickable(element))
+
+    # def click_on(self, element: str, wait=5):
+    #     wait = WebDriverWait(self.driver, wait)
+    #     wait.until(EC.element_to_be_clickable(self.elements[element])).click()

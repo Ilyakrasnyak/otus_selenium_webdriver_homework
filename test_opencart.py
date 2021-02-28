@@ -1,10 +1,10 @@
 import uuid
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from page_objects import MainPage, CategoryPage, ProductPage, LoginPage, AdminLoginPage, \
-                         AdminDashboardPage
+                         AdminDashboardPage, CategoryCreationPage, AdminCategoryPage
 
 
 class TestFirstTask:
@@ -51,37 +51,24 @@ class TestThirdTask:
             .is_title("Dashboard")
 
     def test_fault_create_invalid_categories(self, browser):
-        AdminDashboardPage(browser)
-        wait = WebDriverWait(browser, 5)
-
-        catalog_menu = wait.until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-toggle='collapse'] > i.fa-tags")))
-        catalog_menu.click()
-        category_section = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='collapse1']/li[1]/a")))
-        category_section.click()
-        add_new_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[data-original-title='Add New']")))
-        add_new_btn.click()
-        save_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-original-title='Save']")))
-        save_btn.click()
-
-        error_message = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.alert-danger")))
-        assert error_message.text == "Warning: Please check the form carefully for errors!\n×"
+        AdminDashboardPage(browser) \
+            .menu.open_categories()
+        AdminCategoryPage(browser) \
+            .create_new_category()
+        CategoryCreationPage(browser) \
+            .save_category() \
+            .take_error_with_text("Warning: Please check the form carefully for errors!\n×")
 
     def test_create_valid_categories(self, browser):
-        wait = WebDriverWait(browser, 5)
-        name_field = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[placeholder = 'Category Name']")))
         self.category_name = str(uuid.uuid4())  # сохраняю имя новой категории для ассерта
-        name_field.send_keys(self.category_name)
-        tag_field = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[placeholder='Meta Tag Title']")))
-        tag_field.send_keys("Testy test")
-        save_btn = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "button[data-original-title='Save']")))
-        save_btn.click()
-
-        assert wait.until(EC.presence_of_element_located((By.XPATH, f"//*[contains(text(), '{self.category_name}')]")))
+        CategoryCreationPage(browser) \
+            .fill_category_name(self.category_name) \
+            .fill_tag_title("test_tag") \
+            .save_category()
+        AdminCategoryPage(browser) \
+            .is_category_exist(self.category_name)
 
     def test_logout_admin_panel(self, browser):
-        wait = WebDriverWait(browser, 5)
-        logout_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "i.fa-sign-out")))
-        logout_btn.click()
-        login_form_header = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.panel-title")))
-        assert login_form_header.text == "Please enter your login details."
+        AdminCategoryPage(browser).logout()
+        AdminLoginPage(browser).is_all_element_visible()
+
