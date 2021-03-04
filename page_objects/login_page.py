@@ -11,4 +11,3 @@ class LoginPage(BasePage):
         "continue_register_btn": (By.CSS_SELECTOR, "div.well > a.btn"),
         "forgotten_password_btn": (By.CSS_SELECTOR, "div.well > form > div.form-group > a")
     }
-

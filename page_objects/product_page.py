@@ -11,4 +11,3 @@ class ProductPage(BasePage):
         "review_btn": (By.CSS_SELECTOR, 'a[href="#tab-review"]'),
         "description_btn": (By.CSS_SELECTOR, 'a[href="#tab-description"]')
     }
-

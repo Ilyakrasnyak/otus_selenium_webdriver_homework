@@ -24,4 +24,3 @@ class AdminCategoryPage(BasePage):
     def logout(self):
         self.is_element_clickable(self.elements["logout_btn"]).click()
         return self
-

@@ -32,7 +32,3 @@ class BasePage:
     def is_element_clickable(self, element, wait=5):
         wait = WebDriverWait(self.driver, wait)
         return wait.until(EC.element_to_be_clickable(element))
-
-    # def click_on(self, element: str, wait=5):
-    #     wait = WebDriverWait(self.driver, wait)
-    #     wait.until(EC.element_to_be_clickable(self.elements[element])).click()
