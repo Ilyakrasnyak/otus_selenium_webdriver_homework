@@ -47,15 +47,15 @@ def endpoint(request):
         "login": host + "/index.php?route=account/login",
         "register": host + "/index.php?route=account/register",
         "pass_recovery": host + "/index.php?route=account/forgotten",
-        "admin": host + "/admin/"
+        "admin_login": host + "/admin/"
     }
     return endpoint
 
 
 @pytest.fixture(scope="session")
-def admin():
-    admin = {
-        "name": "user",
-        "password": "bitnami"
+def credentials():
+    credentials = {
+        "admin": ("user", "bitnami"),
+        "error_auth": ("permament", "fault")
     }
-    return admin
+    return credentials
