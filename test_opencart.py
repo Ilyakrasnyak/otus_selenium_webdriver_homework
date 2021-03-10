@@ -1,7 +1,4 @@
 import uuid
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from page_objects import MainPage, CategoryPage, ProductPage, LoginPage, AdminLoginPage, \
                          AdminDashboardPage, CategoryCreationPage, AdminCategoryPage
@@ -71,4 +68,3 @@ class TestThirdTask:
     def test_logout_admin_panel(self, browser):
         AdminCategoryPage(browser).logout()
         AdminLoginPage(browser).is_all_element_visible()
-

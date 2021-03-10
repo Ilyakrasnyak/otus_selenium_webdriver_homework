@@ -1,7 +1,23 @@
+import logging
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.opera.options import Options as OperaOptions
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.events import EventFiringWebDriver, AbstractEventListener
+
+logging.basicConfig(level="INFO", filename="logs/journal.log",
+                    format='%(asctime)s - %(name)s:%(levelname)s - %(message)s')
+
+
+class MyListener(AbstractEventListener):
+    logger = logging.getLogger("DriverEvent")
+
+    def before_navigate_to(self, url, driver):
+        self.logger.info(f"I'm navigating to {url}")
+
+    def on_exception(self, exception, driver):
+        self.logger.error(f'Selenium exception: {exception}')
+        driver.save_screenshot(f'logs/screenshots/{exception}.png')
 
 
 def pytest_addoption(parser):
@@ -32,8 +48,12 @@ def browser(request):
         driver = webdriver.Opera(options=options)
 
     driver.maximize_window()
+    driver = EventFiringWebDriver(driver, MyListener())
+    logging.info(f"Start session with {driver.name}")
 
     yield driver
+
+    logging.info(f"End session with {driver.name}")
     driver.quit()
 
 
@@ -56,6 +76,6 @@ def endpoint(request):
 def credentials():
     credentials = {
         "admin": ("user", "bitnami"),
-        "error_auth": ("permament", "fault")
+        "error_auth": ("permanent", "fault")
     }
     return credentials
