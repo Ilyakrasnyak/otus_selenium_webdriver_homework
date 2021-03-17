@@ -2,7 +2,6 @@ import logging
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.opera.options import Options as OperaOptions
 from selenium.webdriver.support.events import EventFiringWebDriver, AbstractEventListener
 
 logging.basicConfig(level="INFO", filename="logs/journal.log",
@@ -23,15 +22,15 @@ class MyListener(AbstractEventListener):
 def pytest_addoption(parser):
     parser.addoption("--browser", action="store", choices=["chrome", "firefox", "opera"],
                      default='chrome', help="Browser")
-    parser.addoption("--host", action="store", default="127.0.0.1", help="Base URL")
-    parser.addoption("--executor", action="store", default="192.168.8.131")
+    parser.addoption("--host", action="store", default="192.168.0.4", help="Base URL")
+    parser.addoption("--executor", action="store", default="192.168.0.4")
     parser.addoption("--bversion", action="store", default="88.0")
     parser.addoption("--vnc", action="store_true", default=False)
     parser.addoption("--logs", action="store_true", default=False)
     parser.addoption("--videos", action="store_true", default=False)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def browser(request):
     browser = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
@@ -46,20 +45,12 @@ def browser(request):
         "browserName": browser,
         "browserVersion": version,
         "screenResolution": "1280x720",
-        "name": "Mikhail",
         "selenoid:options": {
             "enableVNC": vnc,
             "enableVideo": videos,
             "enableLog": logs
-        },
-        'acceptSslCerts': True,
-        'acceptInsecureCerts': True,
-        'timeZone': 'Europe/Moscow',
-        'goog:chromeOptions': {
-            'args': []
         }
     }
-
 
     driver = webdriver.Remote(
         command_executor=executor_url,
@@ -67,12 +58,13 @@ def browser(request):
     )
 
     driver.maximize_window()
+    driver = EventFiringWebDriver(driver, MyListener())
+    logging.info(f"Start session with {driver.name}")
 
-    def fin():
-        driver.quit()
+    yield driver
 
-    request.addfinalizer(fin)
-    return driver
+    logging.info(f"End session with {driver.name}")
+    driver.quit()
 
 
 @pytest.fixture(scope="session")

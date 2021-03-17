@@ -4,15 +4,13 @@ from page_objects import MainPage, CategoryPage, ProductPage, LoginPage, AdminLo
                          AdminDashboardPage, CategoryCreationPage, AdminCategoryPage
 
 
-class TestFirstTask:
+class TestOpenCart:
+    category_name = None
 
     def test_main_page_title(self, browser, endpoint):
         MainPage(browser) \
             .go_to(endpoint['main']) \
             .is_title('Your Store')
-
-
-class TestSecondTask:
 
     def test_main_page_element_visibility(self, browser):
         MainPage(browser) \
@@ -37,10 +35,6 @@ class TestSecondTask:
         AdminLoginPage(browser) \
             .go_to(endpoint['admin_login']) \
             .is_all_element_visible()
-
-
-class TestThirdTask:
-    category_name = None
 
     def test_login_admin_panel(self, browser, credentials):
         AdminLoginPage(browser) \
