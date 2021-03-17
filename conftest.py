@@ -24,37 +24,55 @@ def pytest_addoption(parser):
     parser.addoption("--browser", action="store", choices=["chrome", "firefox", "opera"],
                      default='chrome', help="Browser")
     parser.addoption("--host", action="store", default="127.0.0.1", help="Base URL")
+    parser.addoption("--executor", action="store", default="192.168.8.131")
+    parser.addoption("--bversion", action="store", default="88.0")
+    parser.addoption("--vnc", action="store_true", default=False)
+    parser.addoption("--logs", action="store_true", default=False)
+    parser.addoption("--videos", action="store_true", default=False)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def browser(request):
     browser = request.config.getoption("--browser")
+    executor = request.config.getoption("--executor")
+    version = request.config.getoption("--bversion")
+    vnc = request.config.getoption("--vnc")
+    logs = request.config.getoption("--logs")
+    videos = request.config.getoption("--videos")
 
-    driver = None
+    executor_url = f"http://{executor}:4444/wd/hub"
 
-    if browser == "chrome":
-        options = webdriver.ChromeOptions()
-        # options.headless = True
-        driver = webdriver.Chrome(options=options)
+    caps = {
+        "browserName": browser,
+        "browserVersion": version,
+        "screenResolution": "1280x720",
+        "name": "Mikhail",
+        "selenoid:options": {
+            "enableVNC": vnc,
+            "enableVideo": videos,
+            "enableLog": logs
+        },
+        'acceptSslCerts': True,
+        'acceptInsecureCerts': True,
+        'timeZone': 'Europe/Moscow',
+        'goog:chromeOptions': {
+            'args': []
+        }
+    }
 
-    elif browser == "firefox":
-        options = webdriver.FirefoxOptions()
-        options.headless = True
-        driver = webdriver.Firefox(options=options)
 
-    elif browser == "opera":
-        options = OperaOptions()
-        options.headless = True
-        driver = webdriver.Opera(options=options)
+    driver = webdriver.Remote(
+        command_executor=executor_url,
+        desired_capabilities=caps
+    )
 
     driver.maximize_window()
-    driver = EventFiringWebDriver(driver, MyListener())
-    logging.info(f"Start session with {driver.name}")
 
-    yield driver
+    def fin():
+        driver.quit()
 
-    logging.info(f"End session with {driver.name}")
-    driver.quit()
+    request.addfinalizer(fin)
+    return driver
 
 
 @pytest.fixture(scope="session")
