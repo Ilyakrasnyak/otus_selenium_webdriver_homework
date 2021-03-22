@@ -1,7 +1,6 @@
 import uuid
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+
+import allure
 
 from page_objects import MainPage, CategoryPage, ProductPage, LoginPage, AdminLoginPage, \
                          AdminDashboardPage, CategoryCreationPage, AdminCategoryPage
@@ -9,6 +8,7 @@ from page_objects import MainPage, CategoryPage, ProductPage, LoginPage, AdminLo
 
 class TestFirstTask:
 
+    @allure.title('Проверка заголовка страницы')
     def test_main_page_title(self, browser, endpoint):
         MainPage(browser) \
             .go_to(endpoint['main']) \
@@ -17,25 +17,30 @@ class TestFirstTask:
 
 class TestSecondTask:
 
+    @allure.title('Проверка видимости элементов главной страницы')
     def test_main_page_element_visibility(self, browser):
         MainPage(browser) \
             .is_all_element_visible()
 
+    @allure.title('Проверка видимости элементов старницы товаров')
     def test_products_page_element_visibility(self, browser, endpoint):
         CategoryPage(browser) \
             .go_to(endpoint['products']) \
             .is_all_element_visible()
 
+    @allure.title('Проверка видимости элементов страницы товара')
     def test_galaxy_tab_page_element_visibility(self, browser, endpoint):
         ProductPage(browser) \
             .go_to(endpoint['galaxy_tab']) \
             .is_all_element_visible()
 
+    @allure.title('Проверка видимости элементов страницы авторизации')
     def test_login_page_element_visibility(self, browser, endpoint):
         LoginPage(browser) \
             .go_to(endpoint['login']) \
             .is_all_element_visible()
 
+    @allure.title('Проверка видимости элементов страницы админки')
     def test_admin_page_element_visibility(self, browser, endpoint):
         AdminLoginPage(browser) \
             .go_to(endpoint['admin_login']) \
@@ -45,11 +50,13 @@ class TestSecondTask:
 class TestThirdTask:
     category_name = None
 
+    @allure.title('Авторизация в админку')
     def test_login_admin_panel(self, browser, credentials):
         AdminLoginPage(browser) \
             .login_with(credentials["admin"]) \
             .is_title("Dashboard")
 
+    @allure.title('Создание невалидной категории')
     def test_fault_create_invalid_categories(self, browser):
         AdminDashboardPage(browser) \
             .menu.open_categories()
@@ -59,6 +66,7 @@ class TestThirdTask:
             .save_category() \
             .take_error_with_text("Warning: Please check the form carefully for errors!\n×")
 
+    @allure.title('Создание валидной категории')
     def test_create_valid_categories(self, browser):
         self.category_name = str(uuid.uuid4())  # сохраняю имя новой категории для ассерта
         CategoryCreationPage(browser) \
@@ -68,7 +76,7 @@ class TestThirdTask:
         AdminCategoryPage(browser) \
             .is_category_exist(self.category_name)
 
+    @allure.title('Выход из админки')
     def test_logout_admin_panel(self, browser):
         AdminCategoryPage(browser).logout()
         AdminLoginPage(browser).is_all_element_visible()
-

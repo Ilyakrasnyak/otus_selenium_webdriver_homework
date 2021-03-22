@@ -1,3 +1,5 @@
+import logging
+
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -8,6 +10,8 @@ class BasePage:
 
     def __init__(self, driver):
         self.driver = driver
+        self.logger = logging.getLogger(type(self).__name__)
+        self.logger.debug(f"Create instance of class {self.logger.name}")
 
     def go_to(self, url):
         self.driver.get(url)
